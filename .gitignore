@@ -1,0 +1,33 @@
+## [ Visual Studio ]
+.vs/
+[Bb]in/
+[Obj]/
+*.user
+*.userosscache
+*.sln.docstates
+
+## [ .NET / Build Output ]
+.codex_build_out/
+.dotnet/
+.dotnet_cli/
+*.log
+bin/
+obj/
+
+## [ .NET Core ]
+project.lock.json
+project.fragment.lock.json
+artifacts/
+out/
+
+## [ Environment Variables & Secrets ]
+.env
+.env.development
+.env.local
+appsettings.Development.json
+appsettings.json
+
+## [ IDEs & Misc ]
+.vscode/
+.idea/
+node_modules/
