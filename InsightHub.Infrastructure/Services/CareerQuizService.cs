@@ -1,7 +1,7 @@
 using InsightHub.Application.Interfaces;
 using InsightHub.Application.ViewModels;
 using InsightHub.Domain.Entities;
-using InsightHub.Domain.Services;
+using InsightHub.Infrastructure.Services;
 using InsightHub.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,24 +24,26 @@ public class CareerQuizService : ICareerQuizService
             .AsNoTracking()
             .Include(q => q.Options)
             .Where(q => q.Id >= 111 && q.Id <= 160)
-            .OrderBy(q => q.Id)
             .ToListAsync();
 
-        return questions.Select(q => new CareerQuizQuestionViewModel
-        {
-            Id = q.Id,
-            Text = q.Text,
-            TrackId = q.TrackId,
-            Type = (q.Id >= 113 && q.Id <= 115) ? "Choice" : q.Type.ToString(),
-            Options = q.Options
-                .Select(o => new CareerQuizQuestionOptionViewModel
-                {
-                    Id = o.Id,
-                    Text = o.Text,
-                    NumericValue = o.NumericValue
-                })
-                .ToList()
-        }).ToList();
+        return questions
+            .OrderBy(_ => Random.Shared.Next())
+            .Select(q => new CareerQuizQuestionViewModel
+            {
+                Id = q.Id,
+                Text = q.Text,
+                TrackId = q.TrackId,
+                Type = (q.Id >= 113 && q.Id <= 115) ? "Choice" : q.Type.ToString(),
+                Options = q.Options
+                    .Select(o => new CareerQuizQuestionOptionViewModel
+                    {
+                        Id = o.Id,
+                        Text = o.Text,
+                        NumericValue = o.NumericValue
+                    })
+                    .ToList()
+            })
+            .ToList();
     }
 
     public async Task<CareerQuizStoredResultViewModel?> GetStoredResultAsync(string userId)

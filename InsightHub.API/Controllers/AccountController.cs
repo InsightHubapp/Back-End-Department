@@ -102,7 +102,6 @@ public class AccountController : ControllerBase
     }
 
     [Authorize]
-    [DisableRateLimiting]
     [HttpPut("UpdateProfile")]
     public async Task<IActionResult> UpdateProfile([FromBody] UserProfileViewModel profile)
     {

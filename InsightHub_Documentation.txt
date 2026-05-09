@@ -1,0 +1,234 @@
+Section 1 — Introduction
+
+1.1 What InsightHub Is and the Problem It Solves
+InsightHub is an ASP.NET Core career guidance platform that helps computer science graduates choose a realistic technical track. It addresses a common problem in career tests: generic recommendations that are disconnected from real job-market behavior.
+
+1.2 Target Users
+InsightHub serves two distinct user groups:
+- Employed professionals: users who already work in a track and provide market-grounded assessment data.
+- Unemployed graduates: users who need a data-driven recommendation for the best-fit career path.
+
+1.3 What Makes It Different from Generic Career Tests
+The platform does not rely only on personality-style scoring. It compares graduate answers against aggregated responses from employed users in each track (same-track market data), then returns similarity scores and market insights. This creates recommendations tied to real professionals, not abstract templates.
+
+1.4 The Two Core Flows
+InsightHub runs two main flows:
+- Survey flow (employed users): employed users answer assessment questions that become market reference data.
+- Career Quiz + Matching flow (unemployed users): graduates answer shared + quiz questions, receive top tracks, similarity scores, and market insights.
+
+
+Section 2 — User Guide
+
+2.1 Registration and Required Fields
+Registration endpoint: POST /api/Account/register
+
+Required fields from the request model:
+- FirstName
+- LastName
+- Email
+- Gender
+- Password
+- ConfirmPassword
+
+Additional fields:
+- BirthDate (optional)
+- Collage (optional)
+- IsEmployed (boolean, default false)
+- TrackId (optional in schema, but required by business rule when IsEmployed = true)
+- YearsExperience (optional)
+
+Business rule enforced in AccountService:
+- If IsEmployed is true and TrackId is missing, registration is rejected with "TrackId is required for employed users."
+
+2.2 Employed User Assessment Flow (Q101–120)
+1. Login and get JWT.
+2. Request questions via GET /api/Survey/questions.
+3. The backend returns ordered questions 101–120 (including shared questions), only for employed users.
+4. Submit answers via POST /api/Survey/submit.
+5. On successful submit, HasCompletedAssessment is set to true.
+
+One-time behavior:
+- GET /api/Survey/questions returns "You have already completed the assessment." after completion.
+
+2.3 Unemployed Graduate Assessment Flow (Q111–160)
+1. Login and get JWT.
+2. Request questions via GET /api/CareerQuiz/questions.
+3. Submit answers via POST /api/CareerQuiz/full-match.
+4. The matching pipeline computes top tracks, similarity scores, and market insights.
+
+Validation details in the current backend:
+- Shared questions 111–120 are required.
+- Career quiz validation currently enforces question IDs 121–145 as required in the controller.
+- Career scoring logic itself is built over seeded quiz questions 121–160.
+
+2.4 What the Graduate Gets Back
+The full-match response returns:
+- Top 3 recommended tracks.
+- For each track: TrackId, TrackName, Description, RequiredSkills, Score, MaxScore, Percentage.
+- TrackSimilarityScore for that track.
+- SimilarityMessage.
+- MarketInsights including employee count, behavioral averages, technical/soft-skill averages, salary/work-life indicators, company environment trends, and experience averages.
+
+2.5 Retrieving Saved Results
+Stored result endpoint: GET /api/CareerQuiz/result
+
+Behavior:
+- Returns the saved result snapshot (quiz result ID, CreatedAt, and top tracks with insights).
+- Returns 404 with "No result found. Please complete the career quiz first." if no result exists.
+
+2.6 What Happens on a Second Submission Attempt
+- Employed flow: question retrieval is blocked after completion by HasCompletedAssessment check in SurveyService.GetQuestionsAsync.
+- Unemployed flow: HasCompletedAssessment is set to true, but full-match currently still accepts re-submission and overwrites stored quiz result (upsert behavior).
+
+
+Section 3 — System Design & Architecture
+
+3.1 Clean Architecture Projects and Responsibilities
+- InsightHub.Domain: core entities and enums (Track, Question, SurveyResponse, QuizResult, etc.).
+- InsightHub.Application: contracts and DTO/view models (interfaces and request/response models).
+- InsightHub.Infrastructure: EF Core persistence, service implementations, seeding, external integrations.
+- InsightHub.API: HTTP controllers, authentication/rate-limit setup, DI composition root, app startup.
+
+3.2 Dependency Rule (Project References)
+- Domain depends on no solution project.
+- Application depends on Domain.
+- Infrastructure depends on Application and Domain.
+- API depends on Application and Infrastructure.
+
+3.3 Database Design (SQL Server + EF Core Code-First)
+Database provider: SQL Server via AppDbContext and EF Core migrations.
+
+Application tables:
+- Tracks: master list of career tracks.
+- CategoryLabels: labels attached to tracks for market/job/news filtering.
+- Questions: all assessment questions (101–160) with type, audience, order, and optional TrackId.
+- QuestionOptions: options for multi-choice questions (notably Q113/Q114/Q115).
+- SurveyResponses: per-user answers (unique by UserId + QuestionId).
+- QuizResults: saved career-quiz result header per user.
+- QuizResultTracks: per-track snapshot under each quiz result (scores + market insights).
+- JobOffers: synced market jobs and categories.
+- NewsArticles: ingested filtered articles by track.
+- InterviewQuestions: interview question bank synced from external API.
+- InterviewQuestionOptions: answer choices for interview questions.
+
+Identity tables (ASP.NET Identity):
+- AspNetUsers
+- AspNetRoles
+- AspNetUserClaims
+- AspNetUserLogins
+- AspNetUserTokens
+- AspNetRoleClaims
+- AspNetUserRoles
+
+3.4 Authentication and Authorization
+- Identity: ASP.NET Identity with ApplicationUser.
+- Token auth: JWT Bearer.
+- JWT claim set includes NameIdentifier and user profile claims.
+- Protected endpoints use [Authorize] (for example survey, career quiz, profile, and submission status endpoints).
+
+3.5 Rate Limiting
+Configured policies (fixed window, 10 requests per minute, queue limit 0, partition by user ID or client IP):
+- CareerQuizPolicy: applied to CareerQuizController and SurveyController.
+- AccountPolicy: applied to AccountController and UserSubmission controller.
+
+Rate-limiting exceptions in AccountController:
+- POST /api/Account/logout
+- POST /api/Account/EmailExistance
+- DELETE /api/Account/DeleteAccount
+
+3.6 Question Structure
+Question ranges:
+- 101–110: Behavioral (employed users, scale-based).
+- 111–120: Shared insights (both groups; mix of Scale and MultiChoice).
+- 121–160: Career Quiz (unemployed users, Yes/No mapped as 1/0).
+
+Question types used in assessment flow:
+- Scale
+- YesNo
+- MultiChoice
+
+3.7 Track Table (9 Tracks with IDs and Category Labels)
+- ID 2: Backend — IT Jobs
+- ID 3: Frontend — IT Jobs, Creative & Design Jobs
+- ID 4: Mobile — IT Jobs
+- ID 5: Game Dev — IT Jobs, Creative & Design Jobs
+- ID 6: Cybersecurity — IT Jobs
+- ID 7: Embedded — IT Jobs, Engineering Jobs
+- ID 8: AI/ML — IT Jobs, Scientific & QA Jobs
+- ID 9: QA/Testing — IT Jobs, Scientific & QA Jobs
+- ID 10: Data Analysis — IT Jobs, Scientific & QA Jobs
+
+
+Section 4 — Implementation Overview
+
+4.1 Career Quiz Scoring Algorithm (Top 3 Tracks)
+The service groups all IsCareerQuiz questions by TrackId, then computes per track:
+- Score: number of answers where AnswerValue = 1 (Yes).
+- MaxScore: total quiz questions for that track.
+- Percentage: Score divided by MaxScore, multiplied by 100, rounded to one decimal.
+
+Tracks are sorted by Percentage descending, and the top 3 are returned.
+
+4.2 Similarity Algorithm
+For each recommended track:
+- Collect employed users in that track.
+- Pull their shared-question responses (111–120).
+- Build graduate shared vector from submitted answers.
+
+Per-question similarity rule:
+- Scale questions: slot similarity = 1 minus min(abs(graduateValue - trackAverage) / 4, 1).
+- MultiChoice questions (113, 114, 115): exact-match against most common employed value (1 if equal, 0 if not).
+
+Final similarity score:
+- Mean of per-question slot similarity values multiplied by 100.
+- Rounded to one decimal.
+
+4.3 Market Insights Aggregation
+Market insights are computed from employed users in the same track and include:
+- TotalEmployeesInTrack
+- AvgYearsExperience (from AspNetUsers.YearsExperience)
+- AvgTechnicalLevel (Q116)
+- AvgSoftSkills (Q117)
+- AvgSalarySatisfaction (Q118)
+- AvgWorkLifeBalance (Q119)
+- MostCommonEnvironment (mode of Q113: Remote/Office/Hybrid)
+- MostCommonCompanySize (mode of Q114: Startup/Mid-size/Corporate)
+- Behavioral averages from Q101–Q110:
+  AvgConsistency, AvgAdaptability, AvgTeamwork, AvgProblemSolving, AvgLearningProactivity,
+  AvgCommunication, AvgPrioritization, AvgOwnership, AvgCollaboration, AvgResilience
+
+4.4 HasCompletedAssessment Flag
+The ApplicationUser entity includes HasCompletedAssessment (default false).
+
+Current usage:
+- Set to true after Survey submission.
+- Set to true after Career full-match execution.
+- Used by SurveyService.GetQuestionsAsync to block repeated question retrieval.
+- Exposed through GET /api/UserSubmission/EmploymentStatus for client-side flow control.
+
+4.5 SaveQuizResultAsync Upsert Logic
+When saving graduate match results:
+1. Load existing QuizResult for the user (including child QuizResultTracks).
+2. If it exists, delete it.
+3. Insert a new QuizResult row with a new CreatedAt.
+4. Insert fresh QuizResultTrack rows for the new top tracks and their insight snapshot.
+
+Because QuizResult -> QuizResultTracks is configured with cascade delete, deleting the old parent removes old child track rows automatically.
+
+4.6 SeedData Behavior
+Startup calls SeedData.InitializeAsync from Program.cs.
+
+InitializeAsync seeds:
+- Tracks (IDs 2–10)
+- Category labels linked in seed definitions
+- Questions 101–160 (inserted only if missing)
+
+The same SeedData class also contains SeedEmployeeResponsesAsync, which seeds:
+- Synthetic employed responses for Q101–120
+- Question options for Q113/Q114/Q115:
+  Remote/Office/Hybrid, Startup/Mid-size/Corporate, Technical/Managerial/Balanced
+
+4.7 Question Randomization
+Career quiz question retrieval is handled by GET /api/CareerQuiz/questions and currently applies random ordering with Guid-based shuffle to the full 111–160 set per request.
+
+Conceptually, 111–120 are the shared insight block and 121–160 are the career quiz block; in the current implementation, both blocks are shuffled together by the backend.

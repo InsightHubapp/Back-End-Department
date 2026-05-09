@@ -25,7 +25,7 @@ public class JobOffersQueryService : IJobOffersQuery
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         var query = _context.JobOffers.AsNoTracking();
-        if (normalized.Count > 0)
+        if (normalized.Count > 0 && !normalized.Contains("general"))
         {
             query = query.Where(x => x.Category != null && normalized.Contains(x.Category));
         }

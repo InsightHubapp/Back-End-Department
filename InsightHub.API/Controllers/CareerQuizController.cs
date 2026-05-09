@@ -26,31 +26,6 @@ public class CareerQuizController : ControllerBase
         var questions = await _careerQuizService.GetQuestionsAsync();
         return Ok(questions);
     }
-    // NOT SURE//////////////////////////////////////////////////////////////////////////
-    //[HttpPost("submit")]
-    //public async Task<IActionResult> Submit([FromBody] SubmitFullMatchViewModel model)
-    //{
-    //    if (!ModelState.IsValid)
-    //    {
-    //        return BadRequest(ModelState);
-    //    }
-
-    //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    //    if (string.IsNullOrWhiteSpace(userId))
-    //    {
-    //        return Unauthorized();
-    //    }
-
-    //    try
-    //    {
-    //        var result = await _careerQuizService.GetMatchResultAsync(userId, model);
-    //        return Ok(result);
-    //    }
-    //    catch (InvalidOperationException ex)
-    //    {
-    //        return BadRequest(new { message = ex.Message });
-    //    }
-    //}
 
     [HttpPost("full-match")]
     public async Task<IActionResult> FullMatch([FromBody] SubmitFullMatchViewModel model)

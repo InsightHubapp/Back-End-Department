@@ -1,7 +1,7 @@
 using InsightHub.Domain.Entities;
 using InsightHub.Domain.Enums;
 
-namespace InsightHub.Domain.Services;
+namespace InsightHub.Infrastructure.Services;
 
 public static class CareerQuizDecisionEngine
 {

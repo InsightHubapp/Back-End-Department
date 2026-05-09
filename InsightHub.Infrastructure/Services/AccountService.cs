@@ -25,17 +25,20 @@ public class AccountService : IAccountService
     private const int OtpLifetimeMinutes = 5;
     private const int MaxFailedAttempts = 5;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly AppDbContext _db;
     public AccountService(
 
         IMemoryCache cache,
         UserManager<ApplicationUser> userManager,
         IConfiguration configuration,
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor,
+        AppDbContext db)
     {
         _cache = cache;
         _userManager = userManager;
         _configuration = configuration;
         _httpContextAccessor = httpContextAccessor;
+        _db = db;
     }
 
     public async Task<AuthResponseViewModel> RegisterAsync(RegisterViewModel model)
@@ -107,20 +110,31 @@ public class AccountService : IAccountService
 
     public async Task<(bool Success, UserProfileViewModel? Profile, IEnumerable<string>? Errors)> UpdateProfileAsync(string userId, UserProfileViewModel profile)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await _userManager.Users
+            .Include(u => u.Track)
+            .FirstOrDefaultAsync(u => u.Id == userId);
         if (user == null)
             return (false, null, null);
 
         user.FirstName = profile.FirstName ?? user.FirstName;
         user.LastName = profile.LastName ?? user.LastName;
         user.Gender = profile.Gender ?? user.Gender;
-        user.BirthDate = profile.BirthDate ?? profile.BirthDate;
+        user.BirthDate = profile.BirthDate ?? user.BirthDate;
         user.Collage = profile.Collage ?? user.Collage;
         user.IsEmployed = profile.IsEmployed ?? user.IsEmployed;
         user.YearsExperience = profile.YearsExperience ?? user.YearsExperience;
 
-        if (profile.IsEmployed == false)
-            user.YearsExperience = 0;
+        if (user.IsEmployed == false)
+        {
+            user.TrackId = null;
+        }
+        else if (profile.TrackName != null)
+        {
+            var track = await _db.Tracks
+                .FirstOrDefaultAsync(t => t.Name == profile.TrackName);
+            if (track != null)
+                user.TrackId = track.Id;
+        }
 
         var result = await _userManager.UpdateAsync(user);
         if (!result.Succeeded)
