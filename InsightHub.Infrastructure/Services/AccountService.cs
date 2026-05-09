@@ -121,8 +121,13 @@ public class AccountService : IAccountService
         user.Gender = profile.Gender ?? user.Gender;
         user.BirthDate = profile.BirthDate ?? user.BirthDate;
         user.Collage = profile.Collage ?? user.Collage;
-        user.IsEmployed = profile.IsEmployed ?? user.IsEmployed;
         user.YearsExperience = profile.YearsExperience ?? user.YearsExperience;
+
+        if (profile.IsEmployed.HasValue && profile.IsEmployed != user.IsEmployed)
+        {
+            user.IsEmployed = profile.IsEmployed.Value;
+            user.HasCompletedAssessment = false;
+        }
 
         if (user.IsEmployed == false)
         {

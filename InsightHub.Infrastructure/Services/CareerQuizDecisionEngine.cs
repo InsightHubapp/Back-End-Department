@@ -5,6 +5,20 @@ namespace InsightHub.Infrastructure.Services;
 
 public static class CareerQuizDecisionEngine
 {
+    private static readonly Dictionary<int, double> QuestionWeights = new()
+    {
+        { 111, 1.5 },  // Field Alignment
+        { 112, 0.8 },  // Experience Level
+        { 113, 0.7 },  // Work Environment
+        { 114, 0.7 },  // Company Size
+        { 115, 0.5 },  // Role Style
+        { 116, 2.0 },  // Technical Level — الأهم
+        { 117, 1.5 },  // Soft Skills
+        { 118, 1.0 },  // Salary Satisfaction
+        { 119, 1.0 },  // Work Life Balance
+        { 120, 1.0 },  // Career Direction
+    };
+
     public static bool HasAllSharedAnswers(IReadOnlyDictionary<int, int> submittedAnswerMap, IReadOnlyCollection<int> sharedQuestionIds)
     {
         return sharedQuestionIds.All(submittedAnswerMap.ContainsKey);
@@ -38,8 +52,8 @@ public static class CareerQuizDecisionEngine
         IReadOnlyDictionary<int, double> graduateAnswers,
         IReadOnlyCollection<SurveyResponse> responses)
     {
-        var totalSimilarity = 0.0;
-        var count = 0;
+        var weightedSum = 0.0;
+        var totalWeight = 0.0;
 
         foreach (var questionId in sharedQuestionIds)
         {
@@ -49,11 +63,13 @@ public static class CareerQuizDecisionEngine
                 .ToList();
 
             if (trackAnswers.Count == 0 || !graduateAnswers.ContainsKey(questionId))
-            {
                 continue;
-            }
 
             var graduateValue = graduateAnswers[questionId];
+            var weight = QuestionWeights.GetValueOrDefault(questionId, 1.0);
+
+            double slotSimilarity;
+
             if (multiChoiceIds.Contains(questionId))
             {
                 var mostCommonValue = trackAnswers
@@ -62,24 +78,23 @@ public static class CareerQuizDecisionEngine
                     .First()
                     .Key;
 
-                totalSimilarity += graduateValue == mostCommonValue ? 1.0 : 0.0;
+                slotSimilarity = graduateValue == mostCommonValue ? 1.0 : 0.0;
             }
             else
             {
                 var average = trackAnswers.Average();
                 var diff = Math.Abs(graduateValue - average) / 4.0;
-                totalSimilarity += 1.0 - Math.Min(diff, 1.0);
+                slotSimilarity = 1.0 - Math.Min(diff, 1.0);
             }
 
-            count++;
+            weightedSum += slotSimilarity * weight;
+            totalWeight += weight;
         }
 
-        if (count == 0)
-        {
+        if (totalWeight == 0)
             return 0;
-        }
 
-        return Math.Round((totalSimilarity / count) * 100, 1);
+        return Math.Round((weightedSum / totalWeight) * 100, 1);
     }
 
     public static string MapEnvironment(int value)
