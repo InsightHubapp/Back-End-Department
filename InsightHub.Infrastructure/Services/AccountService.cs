@@ -252,12 +252,16 @@ public class AccountService : IAccountService
 
     private string GenerateRawOtp()
     {
-        return string.Empty;
+        var bytes = new byte[4];
+        RandomNumberGenerator.Fill(bytes);
+        var number = BitConverter.ToUInt32(bytes, 0) % 1_000_000;
+        return number.ToString("D6");
     }
 
     private string HashOtp(string otp)
     {
-        return string.Empty;
+        var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(otp));
+        return Convert.ToHexString(hashBytes);
     }
 
     private async Task SendOtpEmailAsync(string toEmail, string otp)
@@ -362,6 +366,7 @@ public class AccountService : IAccountService
         var message = new System.Net.Mail.MailMessage();
         message.From = new System.Net.Mail.MailAddress(fromEmail!, "InsightHub");
         message.To.Add(toEmail);
+        message.Body = htmlBody;
         message.Subject = "Your InsightHub Verification Code";
         message.IsBodyHtml = true;
 
