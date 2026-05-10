@@ -26,6 +26,7 @@ namespace InsightHub.Application.ViewModels
         public int Score { get; set; }
         public int MaxScore { get; set; }
         public double Percentage { get; set; }
+        //public object TrackSimilarityScore { get; set; }
     }
 
     public class CareerQuizResultViewModel
