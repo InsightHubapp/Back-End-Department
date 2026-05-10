@@ -29,7 +29,7 @@ public class NewsIngestionService : INewsIngestionService
 
     private static readonly Dictionary<string, (string[] Queries, string[] Keywords)> TrackConfig = new()
     {
-        ["Backend"] = (
+        ["Backend Dev"] = (
         Queries: new[] { "backend API OR \"REST API\" OR \"ASP.NET\" OR \"Node.js\" OR microservice" },
         Keywords: new[] {
             "asp.net core", "node.js runtime", "express.js", "django rest", "fastapi",
@@ -40,7 +40,7 @@ public class NewsIngestionService : INewsIngestionService
             "docker container", "kubernetes deployment", "nginx reverse proxy"
         }
     ),
-        ["Frontend"] = (
+        ["Frontend Dev"] = (
         Queries: new[] { "\"React.js\" OR \"Vue.js\" OR Angular OR frontend OR Tailwind" },
         Keywords: new[] {
             "react.js", "vue.js", "angular framework", "svelte", "tailwind css",
@@ -116,7 +116,7 @@ public class NewsIngestionService : INewsIngestionService
             "procedural generation", "game ai", "pathfinding algorithm"
         }
     ),
-        ["Mobile"] = (
+        ["Mobile Dev"] = (
         Queries: new[] { "\"mobile development\" OR Flutter OR \"React Native\" OR \"Android development\" OR \"iOS development\"" },
         Keywords: new[] {
             "flutter widget", "react native app", "swift ios", "kotlin android",

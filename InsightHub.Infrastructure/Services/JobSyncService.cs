@@ -34,10 +34,10 @@ namespace InsightHub.Services
         {
             var categoryMap = new Dictionary<string, List<string>>
             {
-                ["Backend"] = new() { "backend", "back-end", "node", "django", "flask", "spring", "laravel", "php", "asp.net", ".net", "golang", "rest api" },
-                ["Frontend"] = new() { "frontend", "react", "angular", "vue", "javascript", "typescript", "html", "css" },
+                ["Backend Dev"] = new() { "backend", "back-end", "node", "django", "flask", "spring", "laravel", "php", "asp.net", ".net", "golang", "rest api" },
+                ["Frontend Dev"] = new() { "frontend", "react", "angular", "vue", "javascript", "typescript", "html", "css" },
                 ["Full Stack"] = new() { "fullstack", "full-stack", "mern", "mean", "lamp" },
-                ["Mobile"] = new() { "mobile", "android", "ios", "flutter", "react native", "swift", "kotlin" },
+                ["Mobile Dev"] = new() { "mobile", "android", "ios", "flutter", "react native", "swift", "kotlin" },
                 ["Game Dev"] = new() { "game", "unity", "unreal", "godot" },
                 ["Q/A Testing"] = new() { "tester", "qa", "automation", "selenium", "cypress", "playwright", "sdet" },
                 ["Embedded"] = new() { "embedded", "firmware", "iot", "microcontroller", "raspberry pi" },

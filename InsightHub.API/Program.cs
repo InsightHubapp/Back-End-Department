@@ -157,7 +157,7 @@ namespace InsightHub
                 recurringJobManager.AddOrUpdate<INewsIngestionService>(
                     "news-ingest",
                     job => job.IngestAsync(),
-                    Cron.Minutely
+                    Cron.HourInterval(12)
                 );
 
                 recurringJobManager.AddOrUpdate<IInterviewQuestionsSyncService>(

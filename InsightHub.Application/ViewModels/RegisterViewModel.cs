@@ -1,6 +1,7 @@
 using InsightHub.Domain.Enums;
 using System;
 using System.ComponentModel.DataAnnotations;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace InsightHub.Application.ViewModels;
 
@@ -21,7 +22,7 @@ public class RegisterViewModel
     [Required]
     public Gender Gender { get; set; }
 
-    public DateTime? BirthDate { get; set; }
+    public DateOnly? BirthDate { get; set; }
 
     [StringLength(50)]
     public string? Collage { get; set; }
