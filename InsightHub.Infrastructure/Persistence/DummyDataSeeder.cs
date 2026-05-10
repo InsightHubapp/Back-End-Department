@@ -8,7 +8,7 @@ namespace InsightHub.Infrastructure.Persistence;
 
 public static class DummyDataSeeder
 {
-    private const int TargetUserCount = 1000;
+    private const int TargetUserCount = 2000;
     private const string UserNamePrefix = "market_emp_";
 
     private static readonly int[] TrackIds = [2, 3, 4, 5, 6, 7, 8, 9, 10];

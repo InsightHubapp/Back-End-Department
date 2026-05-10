@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Threading.RateLimiting;
 namespace InsightHub
 {
-    // RateLimitPolicies.cs
     public static class RateLimitPolicies
     {
         public const string CareerQuiz = "CareerQuizPolicy";

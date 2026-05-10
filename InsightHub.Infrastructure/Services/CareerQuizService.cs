@@ -72,7 +72,7 @@ public class CareerQuizService : ICareerQuizService
                     RequiredSkills = t.RequiredSkills,
                     Score = t.Score,
                     MaxScore = t.MaxScore,
-                    Percentage = t.Percentage
+                    Percentage = t.TrackSimilarityScore
                 },
                 TrackSimilarityScore = t.TrackSimilarityScore,
                 SimilarityMessage = t.SimilarityMessage,
@@ -146,14 +146,14 @@ public class CareerQuizService : ICareerQuizService
 
         var topTracks = await CalculateTopTracksAsync(validAnswerMap);
         var graduateSharedVector = CareerQuizDecisionEngine.BuildGraduateSharedVector(validAnswerMap, SharedQuestionIds);
-        var topTrackResults = new List<TrackAverageMatchViewModel>();
+        var allTrackResults = new List<TrackAverageMatchViewModel>();
 
         foreach (var track in topTracks)
         {
             var similarity = await CalculateTrackAverageSimilarityAsync(graduateSharedVector, track.TrackId);
             var marketInsights = await GetMarketInsightsAsync(track.TrackId);
 
-            topTrackResults.Add(new TrackAverageMatchViewModel
+            allTrackResults.Add(new TrackAverageMatchViewModel
             {
                 Track = track,
                 TrackSimilarityScore = similarity.Score,
@@ -161,6 +161,12 @@ public class CareerQuizService : ICareerQuizService
                 MarketInsights = marketInsights
             });
         }
+
+        var topTrackResults = allTrackResults
+            .OrderByDescending(t => t.TrackSimilarityScore)
+            .ThenByDescending(t => t.Track.Percentage)
+            .Take(3)
+            .ToList();
 
         user.HasCompletedAssessment = true;
         await _db.SaveChangesAsync();
@@ -196,7 +202,7 @@ public class CareerQuizService : ICareerQuizService
                 RequiredSkills = t.Track.RequiredSkills ?? string.Empty,
                 Score = t.Track.Score,
                 MaxScore = t.Track.MaxScore,
-                Percentage = t.Track.Percentage,
+                Percentage = t.TrackSimilarityScore,
                 TrackSimilarityScore = t.TrackSimilarityScore,
                 SimilarityMessage = t.SimilarityMessage ?? string.Empty,
                 TotalEmployeesInTrack = t.MarketInsights?.TotalEmployeesInTrack ?? 0,
@@ -344,11 +350,8 @@ public class CareerQuizService : ICareerQuizService
                     Percentage = max == 0 ? 0 : Math.Round((double)score / max * 100, 1)
                 };
             })
-            .OrderByDescending(t => t.Percentage)
-            .Take(3)
-            .ToList();
+            .ToList(); 
     }
-
     private async Task UpsertUserAnswersAsync(string userId, Dictionary<int, int> answers)
     {
         var ids = answers.Keys.ToList();

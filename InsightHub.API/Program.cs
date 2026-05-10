@@ -108,7 +108,9 @@ namespace InsightHub
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
                 SeedData.InitializeAsync(db).GetAwaiter().GetResult();
+                await DummyDataSeeder.SeedMarketDataAsync(db, userManager); //Add Dummy Users to Test the Assissmint
             }
 
             app.UseExceptionHandler(errorApp =>

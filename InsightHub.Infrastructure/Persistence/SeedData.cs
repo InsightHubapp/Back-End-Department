@@ -8,9 +8,6 @@ public static class SeedData
 {
     public static async Task InitializeAsync(AppDbContext db)
     {
-        // =========================
-        // 1. TRACKS & CATEGORY LABELS
-        // =========================
         if (!await db.Tracks.AnyAsync())
         {
             var itJobs = new CategoryLabel { Name = "IT Jobs" };
@@ -47,9 +44,6 @@ public static class SeedData
             }
         }
 
-        // =========================
-        // 2. QUESTIONS
-        // =========================
         var existingIds = await db.Questions
             .AsNoTracking()
             .Where(q => q.Id >= 101 && q.Id <= 160)
@@ -127,9 +121,6 @@ public static class SeedData
             await db.SaveChangesAsync();
         }
 
-        // =========================
-        // 3. QUESTION OPTIONS
-        // =========================
         if (!await db.QuestionOptions.AnyAsync())
         {
             var options = new List<QuestionOption>
