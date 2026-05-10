@@ -17,9 +17,9 @@ public static class SeedData
 
             var tracks = new List<Track>
             {
-                new Track { Id = 2, Name = "Backend", Description = "Server-side logic, database management, and API development.", RequiredSkills = "C# (.NET), SQL Server, Entity Framework, RESTful APIs, JWT", CategoryLabels = new List<CategoryLabel> { itJobs } },
-                new Track { Id = 3, Name = "Frontend", Description = "Creating the visual elements and interactive user interface.", RequiredSkills = "HTML5, CSS3, JavaScript (ES6+), React.js/Angular", CategoryLabels = new List<CategoryLabel> { itJobs, creativeJobs } },
-                new Track { Id = 4, Name = "Mobile", Description = "Develops applications for iOS and Android platforms.", RequiredSkills = "Dart (Flutter), State Management, Firebase", CategoryLabels = new List<CategoryLabel> { itJobs } },
+                new Track { Id = 2, Name = "Backend Dev", Description = "Server-side logic, database management, and API development.", RequiredSkills = "C# (.NET), SQL Server, Entity Framework, RESTful APIs, JWT", CategoryLabels = new List<CategoryLabel> { itJobs } },
+                new Track { Id = 3, Name = "Frontend Dev", Description = "Creating the visual elements and interactive user interface.", RequiredSkills = "HTML5, CSS3, JavaScript (ES6+), React.js/Angular", CategoryLabels = new List<CategoryLabel> { itJobs, creativeJobs } },
+                new Track { Id = 4, Name = "Mobile Dev", Description = "Develops applications for iOS and Android platforms.", RequiredSkills = "Dart (Flutter), State Management, Firebase", CategoryLabels = new List<CategoryLabel> { itJobs } },
                 new Track { Id = 5, Name = "Game Dev", Description = "Designing game mechanics and interactive environments.", RequiredSkills = "C#, Unity Engine, Game Physics, Basic 3D Math", CategoryLabels = new List<CategoryLabel> { itJobs, creativeJobs } },
                 new Track { Id = 6, Name = "Cybersecurity", Description = "Protects systems, networks, and data from digital attacks.", RequiredSkills = "Networking (TCP/IP), Linux, OWASP Top 10", CategoryLabels = new List<CategoryLabel> { itJobs } },
                 new Track { Id = 7, Name = "Embedded", Description = "Programming microcontrollers and hardware devices.", RequiredSkills = "Embedded C/C++, ARM Cortex, UART/I2C/SPI", CategoryLabels = new List<CategoryLabel> { itJobs, engineeringJobs } },
