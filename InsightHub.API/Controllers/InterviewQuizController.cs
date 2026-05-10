@@ -1,5 +1,6 @@
 using InsightHub.Application.Interfaces;
 using InsightHub.Application.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InsightHub.API.Controllers;
@@ -14,7 +15,7 @@ public class InterviewQuizController : ControllerBase
     {
         _interviewQuizService = interviewQuizService;
     }
-
+    [Authorize]
     [HttpPost("Questions")]
     public async Task<IActionResult> GetByTrack([FromBody] QuizCategoryVM trackName)
     {
@@ -31,7 +32,7 @@ public class InterviewQuizController : ControllerBase
 
         return Ok(questions);
     }
-
+    [Authorize]
     [HttpPost("Submit")]
     public async Task<IActionResult> SubmitAnswers([FromBody] SubmitAnswersVM submission)
     {
