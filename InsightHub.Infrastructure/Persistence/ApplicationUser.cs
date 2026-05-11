@@ -19,7 +19,7 @@ public class ApplicationUser : IdentityUser
     [Required]
     public Gender Gender { get; set; }
 
-    public DateOnly? BirthDate { get; set; }
+    public DateTime? BirthDate { get; set; }
 
     [StringLength(50)]
     public string? Collage { get; set; }

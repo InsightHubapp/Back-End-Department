@@ -18,7 +18,7 @@ public class UserProfileViewModel
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public Gender? Gender { get; set; }
-    public DateOnly? BirthDate { get; set; }
+    public DateTime? BirthDate { get; set; }
     public string? Collage { get; set; } = string.Empty;
     public bool? IsEmployed { get; set; }
     public int? YearsExperience { get; set; }
