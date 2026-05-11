@@ -40,6 +40,7 @@ public class CareerQuizStoredTrackInfoViewModel
     public int Score { get; set; }
     public int MaxScore { get; set; }
     public double Percentage { get; set; }
+    public double CombinedScore { get; set; }
 }
 
 public class CareerQuizStoredMarketInsightsViewModel

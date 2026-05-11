@@ -97,6 +97,14 @@ public static class CareerQuizDecisionEngine
         return Math.Round((weightedSum / totalWeight) * 100, 1);
     }
 
+    private const double AptitudeWeight = 0.4;
+    private const double SimilarityWeight = 0.6;
+
+    public static double ComputeCombinedScore(double aptitudePercentage, double similarityScore)
+    {
+        return Math.Round((aptitudePercentage * AptitudeWeight) + (similarityScore * SimilarityWeight), 1);
+    }
+
     public static string MapEnvironment(int value)
     {
         return value switch

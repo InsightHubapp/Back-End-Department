@@ -16,6 +16,7 @@ namespace InsightHub.Domain.Entities
 
         public int Score { get; set; }
         public int MaxScore { get; set; }
+        public double CombinedScore { get; set; }
         public double Percentage { get; set; }
         public double TrackSimilarityScore { get; set; }
         public int TotalEmployeesInTrack { get; set; }
