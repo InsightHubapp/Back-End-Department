@@ -77,6 +77,7 @@ public class CareerQuizService : ICareerQuizService
                     Percentage = t.Percentage
                 },
                 TrackSimilarityScore = t.TrackSimilarityScore,
+                CombinedScore = t.CombinedScore,
                 SimilarityMessage = t.SimilarityMessage,
                 MarketInsights = new CareerQuizStoredMarketInsightsViewModel
                 {
