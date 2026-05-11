@@ -13,6 +13,7 @@ public class CareerQuizService : ICareerQuizService
     private static readonly int[] SharedQuestionIds = Enumerable.Range(111, 10).ToArray();
     private static readonly int[] MultiChoiceIds = { 113, 114, 115 };
 
+
     public CareerQuizService(AppDbContext db)
     {
         _db = db;
@@ -158,14 +159,23 @@ public class CareerQuizService : ICareerQuizService
                 track.Percentage,
                 similarity.Score
             );
+
+            var message = CareerQuizDecisionEngine.GenerateSimilarityMessage(
+                combinedScore,
+                track.Percentage,
+                similarity.Score,
+                track.TrackName
+            );
+
             allTrackResults.Add(new TrackAverageMatchViewModel
             {
                 Track = track,
                 TrackSimilarityScore = similarity.Score,
                 CombinedScore = combinedScore,
-                SimilarityMessage = similarity.Message,
+                SimilarityMessage = message,
                 MarketInsights = marketInsights
             });
+        
         }
 
         var topTrackResults = allTrackResults
