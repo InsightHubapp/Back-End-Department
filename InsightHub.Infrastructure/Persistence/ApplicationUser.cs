@@ -2,6 +2,7 @@ using InsightHub.Domain.Entities;
 using InsightHub.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace InsightHub.Infrastructure.Persistence;
 
@@ -18,7 +19,7 @@ public class ApplicationUser : IdentityUser
     [Required]
     public Gender Gender { get; set; }
 
-    public DateTime? BirthDate { get; set; }
+    public DateOnly? BirthDate { get; set; }
 
     [StringLength(50)]
     public string? Collage { get; set; }
